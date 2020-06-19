@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 def driver():
     driver = webdriver.Chrome()
     driver.get('https://qualityminds.de')
-    driver.implicitly_wait(3)
+    driver.implicitly_wait(10)
     yield driver
     driver.quit()
 
@@ -41,4 +41,15 @@ def test_portfolio_mobile(driver, wait):
     wait.until(EC.visibility_of(portfolio_sub_menu))
     web_automation_amp_mobile_testing = driver.find_element_by_link_text("Web, Automation & Mobile Testing")
     web_automation_amp_mobile_testing.click()
-
+    a = driver.find_element_by_class_name('page_title')
+    assert a.find_element_by_tag_name('span').text == 'Web, Automation & Mobile Testing'
+    wait.until(EC.visibility_of(a))
+    portfolio = driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]/..")
+    assert 'current_page_ancestor' in portfolio.get_attribute('class')
+    mobile_section_title = driver.find_element_by_xpath("//div[@id='team-tab-three-title-desktop']/..")
+    mobile_section_title.click()
+    mobile_section = driver.find_element_by_id("team-tab-three-body")
+    wait.until(EC.visibility_of(mobile_section))
+    assert 'inactive-team-tab' not in mobile_section_title.get_attribute('class')
+    assert mobile_section.find_element_by_class_name('sb_mod_acf_single_item').is_displayed()
+    assert mobile_section.find_element_by_class_name('tab-download-button').is_displayed()
