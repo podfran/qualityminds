@@ -61,7 +61,7 @@ def test_portfolio_mobile(driver, wait):
     assert mobile_section.find_element_by_class_name('sb_mod_acf_single_item').is_displayed()
     assert mobile_section.find_element_by_class_name('tab-download-button').is_displayed()
     flyer_link_ref = 'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
-    flyer_link = mobile_section.find_element_by_xpath('//a[contains(@download, "FLYER FIND THE BUG SESSION")]')
+    flyer_link = mobile_section.find_element_by_xpath('.//a[contains(@download, "FLYER FIND THE BUG SESSION")]')
     assert flyer_link.get_attribute('href') == flyer_link_ref
     flyer_link.click()
     download_file_path = Path(os.getcwd()) / 'FLYER FIND THE BUG SESSION.pdf'
@@ -69,3 +69,30 @@ def test_portfolio_mobile(driver, wait):
         if download_file_path.is_file():
             break
     download_file_path.unlink()
+
+
+def test_career_site(driver, wait):
+    driver.find_element_by_xpath("//a[contains(text(),'Karriere')]").click()
+    page_title = driver.find_element_by_xpath('//h1[contains(@class, "text-padded")]/span')
+    assert page_title.text == 'Werde ein QualityMind!'
+    bewirb_dich_jetzt = driver.find_element_by_xpath('//a[contains(text(), "Bewirb dich jetzt!")]')
+    bewirb_dich_jetzt.click()
+    page_title = driver.find_element_by_id('job-ad-form-title')
+    assert page_title.is_displayed()
+    submit_button = driver.find_element_by_xpath('//input[contains(@value, "Jetzt Bewerben")]')
+    submit_button.click()
+    form = driver.find_element_by_class_name('first_row')
+    assert len(form.find_elements_by_xpath(".//span[text()='Dies ist ein Pflichtfeld.']")) == 3
+    vorname = driver.find_element_by_xpath("//input[contains(@placeholder, 'Vorname')]")
+    vorname.send_keys('Franciszek')
+    nachname = driver.find_element_by_xpath("//input[contains(@placeholder, 'Nachname')]")
+    nachname.send_keys('Podborski')
+    submit_button.click()
+    email_container = driver.find_element_by_xpath("//label[text()='Email']/..")
+    email_validation = email_container.find_element_by_xpath(".//span/span")
+    assert email_validation.text == 'Dies ist ein Pflichtfeld.'
+    email_filed = email_container.find_element_by_tag_name('input')
+    email_filed.send_keys('aaaaaa')
+    submit_button.click()
+    email_validation = email_container.find_element_by_xpath(".//span/span")
+    assert email_validation.text == 'Die Eingabe muss eine gültige E-Mail-Adresse sein.'
