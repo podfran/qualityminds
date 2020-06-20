@@ -10,12 +10,30 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 @pytest.fixture
-def driver():
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_experimental_option("prefs", {
-        'download.default_directory': os.getcwd()
-    })
-    driver = webdriver.Chrome(options=chrome_options)
+def available_browsers():
+    def chrome():
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option("prefs", {'download.default_directory': os.getcwd()})
+        return webdriver.Chrome(options=options)
+
+    def firefox():
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference("browser.download.folderList", 2)
+        profile.set_preference("browser.download.dir", os.getcwd())
+        profile.set_preference("browser.download.manager.showWhenStarting", False)
+        profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/pdf")
+        return webdriver.Firefox(firefox_profile=profile)
+
+    return {
+        'chrome': chrome,
+        'firefox': firefox
+    }
+
+
+@pytest.fixture
+@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+def driver(available_browsers, browser):
+    driver = available_browsers[browser]()
     driver.get('https://qualityminds.de')
     driver.implicitly_wait(10)
     yield driver
@@ -27,20 +45,21 @@ def wait():
     return WebDriverWait(driver, timeout=10)
 
 
-def test_contact_email(driver, wait):
+@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+def test_contact_email(driver, wait, browser):
     driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]").click()
-    wait.until(EC.visibility_of_element_located((By.XPATH, "//span[contains(.,'Kontakt & Anfahrt')]")))
+    driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
     assert 'hello@qualityminds.de' in driver.page_source
     kontakt_page_main_content = driver.find_element_by_id('main-content').text
     driver.get('https://qualityminds.de')
-    wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(),'Kontakt & Anfahrt')]")))
     kontakt_amp_anfahrt = driver.find_element_by_xpath("//a[contains(text(),'Kontakt & Anfahrt')]")
     kontakt_amp_anfahrt.click()
-    wait.until(EC.visibility_of_element_located((By.XPATH, "//span[contains(.,'Kontakt & Anfahrt')]")))
+    driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
     assert driver.find_element_by_id('main-content').text == kontakt_page_main_content
 
 
-def test_portfolio_mobile(driver, wait):
+@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+def test_portfolio_mobile(driver, wait, browser):
     portfolio = driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
     portfolio_hover = ActionChains(driver).move_to_element(portfolio)
     portfolio_hover.perform()
@@ -63,7 +82,7 @@ def test_portfolio_mobile(driver, wait):
     flyer_link_ref = 'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
     flyer_link = mobile_section.find_element_by_xpath('.//a[contains(@download, "FLYER FIND THE BUG SESSION")]')
     assert flyer_link.get_attribute('href') == flyer_link_ref
-    flyer_link.click()
+    flyer_link.click()  # can't seem to get rid of the download dialog on ff
     download_file_path = Path(os.getcwd()) / 'FLYER FIND THE BUG SESSION.pdf'
     while True:  # needs timeout
         if download_file_path.is_file():
@@ -71,7 +90,8 @@ def test_portfolio_mobile(driver, wait):
     download_file_path.unlink()
 
 
-def test_career_site(driver, wait):
+@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+def test_career_site(driver, browser):
     driver.find_element_by_xpath("//a[contains(text(),'Karriere')]").click()
     page_title = driver.find_element_by_xpath('//h1[contains(@class, "text-padded")]/span')
     assert page_title.text == 'Werde ein QualityMind!'
