@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 
 import pytest
@@ -19,8 +20,10 @@ def available_browsers():
         profile = webdriver.FirefoxProfile()
         profile.set_preference("browser.download.folderList", 2)
         profile.set_preference("browser.download.dir", os.getcwd())
+        profile.set_preference("browser.download.useDownloadDir", True)
         profile.set_preference("browser.download.manager.showWhenStarting", False)
         profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/pdf")
+        profile.set_preference("pdfjs.disabled", True)
         return webdriver.Firefox(firefox_profile=profile)
 
     return {
@@ -81,11 +84,15 @@ def test_portfolio_mobile(driver, wait, browser):
     flyer_link_ref = 'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
     flyer_link = mobile_section.find_element_by_xpath('.//a[contains(@download, "FLYER FIND THE BUG SESSION")]')
     assert flyer_link.get_attribute('href') == flyer_link_ref
-    flyer_link.click()  # can't seem to get rid of the download dialog on ff
-    download_file_path = Path(os.getcwd()) / 'FLYER FIND THE BUG SESSION.pdf'
+    flyer_link.click()
+    file_name = 'FLYER FIND THE BUG SESSION'
+    if browser == 'chrome':
+        file_name += '.pdf'
+    download_file_path = Path(os.getcwd()) / file_name
     while True:  # needs timeout
         if download_file_path.is_file():
             break
+        time.sleep(1)
     download_file_path.unlink()
 
 
