@@ -1,2 +1,9 @@
+# Python folders
 venv
+.pytest_cache
+
+# PyCharm project files
 .idea
+
+# Log for geckodriver
+geckodriver.log
