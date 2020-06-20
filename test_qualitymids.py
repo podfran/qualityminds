@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from selenium import webdriver
 from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -46,7 +45,7 @@ def wait():
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
-def test_contact_email(driver, wait, browser):
+def test_contact_email(driver, browser):
     driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]").click()
     driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
     assert 'hello@qualityminds.de' in driver.page_source
