@@ -121,6 +121,7 @@ def test_career_site(driver, browser):
         upload_file.write('aaaa')
     upload_button = driver.find_element_by_xpath('//input[contains(@type, "file")]')
     upload_button.send_keys(str(upload_file_path))
+    upload_file_path.unlink()
     uploaded_file_name = driver.find_element_by_class_name('file-name')
     assert uploaded_file_name.text == file_name
     check_box = driver.find_element_by_xpath("//input[contains(@type, 'checkbox')]")
