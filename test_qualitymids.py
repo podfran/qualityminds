@@ -63,25 +63,17 @@ def test_contact_email(main_page, browser):
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
-def test_portfolio_mobile(driver, wait, main_page, browser):
+def test_portfolio_mobile(main_page, browser):
     main_page.hover_over_portfolio()
     assert main_page.portfolio_sub_menu.is_displayed()
-    web_automation_amp_mobile_testing = driver.find_element_by_link_text("Web, Automation & Mobile Testing")
-    web_automation_amp_mobile_testing.click()
-    page_title = driver.find_element_by_class_name('page_title')
-    assert page_title.find_element_by_tag_name('span').text == 'Web, Automation & Mobile Testing'
-    wait.until(EC.visibility_of(page_title))
-    portfolio = driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]/..")
-    assert 'current_page_ancestor' in portfolio.get_attribute('class')
-    mobile_section_title = driver.find_element_by_xpath("//div[@id='team-tab-three-title-desktop']/..")
-    mobile_section_title.click()
-    mobile_section = driver.find_element_by_id("team-tab-three-body")
-    wait.until(EC.visibility_of(mobile_section))
-    assert 'inactive-team-tab' not in mobile_section_title.get_attribute('class')
-    assert mobile_section.find_element_by_class_name('sb_mod_acf_single_item').is_displayed()
-    assert mobile_section.find_element_by_class_name('tab-download-button').is_displayed()
+    wam_testing_page = main_page.click_web_automation_amp_mobile_testing()
+    assert wam_testing_page.is_portfolio_item_selected()
+    wam_testing_page.mobile_section_title.click()
+    assert 'inactive-team-tab' not in wam_testing_page.mobile_section_title.get_attribute('class')
+    assert wam_testing_page.mobile_section.find_element_by_class_name('sb_mod_acf_single_item').is_displayed()
+    assert wam_testing_page.mobile_section.find_element_by_class_name('tab-download-button').is_displayed()
     flyer_link_ref = 'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
-    flyer_link = mobile_section.find_element_by_xpath('.//a[contains(@download, "FLYER FIND THE BUG SESSION")]')
+    flyer_link = wam_testing_page.mobile_section.find_element_by_xpath('.//a[contains(@download, "FLYER FIND THE BUG SESSION")]')
     assert flyer_link.get_attribute('href') == flyer_link_ref
     flyer_link.click()
     file_name = 'FLYER FIND THE BUG SESSION'
