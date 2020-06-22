@@ -16,6 +16,31 @@ class MainPage:
         self.karriere = self.driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
         self.kontakt_amp_anfahrt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt & Anfahrt')]")
 
+    def click_kontakt(self):
+        self.kontakt.click()
+        return KontaktPage(self.driver)
+
+    def click_kontakt_amp_anfahrt(self):
+        self.kontakt_amp_anfahrt.click()
+        return KontaktPage(self.driver)
+
+
+class KontaktPage:
+    def __init__(self, driver):
+        self.driver = driver
+        self.driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
+        self.page_content = self.driver.find_element_by_id('main-content').text
+
+    def __contains__(self, item):
+        return item in self.page_content
+
+    def __eq__(self, other):
+        return self.page_content == other.page_content
+
+    def return_to_main_page(self):
+        self.driver.get('https://qualityminds.de')
+        return MainPage(self.driver)
+
 
 @pytest.fixture
 def available_browsers():
@@ -61,15 +86,12 @@ def main_page(driver):
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
-def test_contact_email(driver, main_page, browser):
-    main_page.kontakt.click()
-    driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
-    assert 'hello@qualityminds.de' in driver.page_source
-    kontakt_page_main_content = driver.find_element_by_id('main-content').text
-    driver.get('https://qualityminds.de')
-    main_page.kontakt_amp_anfahrt.click()
-    driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
-    assert driver.find_element_by_id('main-content').text == kontakt_page_main_content
+def test_contact_email(main_page, browser):
+    kontakt_page = main_page.click_kontakt()
+    assert 'hello@qualityminds.de' in kontakt_page
+    main_page = kontakt_page.return_to_main_page()
+    kontakt_amp_anfahrt_page = main_page.click_kontakt_amp_anfahrt()
+    assert kontakt_amp_anfahrt_page == kontakt_page
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
