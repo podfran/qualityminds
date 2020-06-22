@@ -95,15 +95,14 @@ def test_career_site(driver, main_page, browser):
     page_title = driver.find_element_by_id('job-ad-form-title')
     assert page_title.is_displayed()
     bewerbungsformular_page.submit_button.click()
-    assert len(bewerbungsformular_page.form.find_elements_by_xpath(".//span[text()='Dies ist ein Pflichtfeld.']")) == 3
+    assert len(bewerbungsformular_page.form.find_elements_by_xpath(".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 3
     bewerbungsformular_page.name_field.send_keys('Franciszek')
     bewerbungsformular_page.surname_field.send_keys('Podborski')
     bewerbungsformular_page.submit_button.click()
     email_container = driver.find_element_by_xpath("//label[text()='Email']/..")
     email_validation = email_container.find_element_by_xpath(".//span/span")
     assert email_validation.text == 'Dies ist ein Pflichtfeld.'
-    email_filed = email_container.find_element_by_tag_name('input')
-    email_filed.send_keys('aaaaaa')
+    bewerbungsformular_page.email_field.send_keys('aaaaaa')
     bewerbungsformular_page.submit_button.click()
     email_validation = email_container.find_element_by_xpath(".//span/span")
     assert email_validation.text == 'Die Eingabe muss eine gültige E-Mail-Adresse sein.'

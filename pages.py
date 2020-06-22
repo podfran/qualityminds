@@ -97,9 +97,10 @@ class KarrierePage:
 class BewerbungsformularPage:
     def __init__(self, driver):
         self.driver = driver
-        self.submit_button = self.driver.find_element_by_xpath('//input[contains(@value, "Jetzt Bewerben")]')
-        self.form = self.driver.find_element_by_class_name('first_row')
-        self.name_field = self.driver.find_element_by_xpath("//input[contains(@placeholder, 'Vorname')]")
-        self.surname_field = self.driver.find_element_by_xpath("//input[contains(@placeholder, 'Nachname')]")
+        self.submit_button = self.driver.find_element_by_xpath('//input[@value="Jetzt Bewerben"]')
+        self.form = self.driver.find_element_by_id('CF5bcf0384b847c_1')
+        self.name_field = self.form.find_element_by_id("fld_1144146_1")
+        self.surname_field = self.form.find_element_by_id("fld_7067875_1")
+        self.email_field = self.form.find_element_by_id("fld_3149235_1")
 
 
