@@ -1,10 +1,11 @@
+import contextlib
 import os
-import time
 from pathlib import Path
 
 import pytest
 from selenium import webdriver
 
+from file_utils import is_file_downloaded
 from pages import MainPage
 
 
@@ -46,6 +47,19 @@ def main_page(driver):
     return MainPage(driver)
 
 
+@pytest.fixture
+@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+def download_file_path(browser):
+    file_name = 'FLYER FIND THE BUG SESSION'
+    if browser == 'chrome':
+        file_name += '.pdf'
+    download_file_path = Path(os.getcwd()) / file_name
+    yield download_file_path
+    print('Hello')
+    with contextlib.suppress(FileNotFoundError):
+        download_file_path.unlink()
+
+
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
 def test_contact_email(main_page, browser):
     kontakt_page = main_page.click_kontakt()
@@ -56,7 +70,7 @@ def test_contact_email(main_page, browser):
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
-def test_portfolio_mobile(main_page, browser):
+def test_portfolio_mobile(main_page, download_file_path, browser):
     main_page.hover_over_portfolio()
     assert main_page.portfolio_sub_menu.is_displayed()
     wam_testing_page = main_page.click_web_automation_amp_mobile_testing()
@@ -65,18 +79,11 @@ def test_portfolio_mobile(main_page, browser):
     assert wam_testing_page.mobile_section.section_body.is_displayed()
     assert wam_testing_page.mobile_section.is_title_selected()
     assert wam_testing_page.mobile_section.flyer_link.is_displayed()
-    flyer_link_ref = 'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
-    assert wam_testing_page.mobile_section.flyer_link.get_attribute('href') == flyer_link_ref
+    assert wam_testing_page.mobile_section.flyer_link.get_attribute('href') == \
+           'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
     wam_testing_page.mobile_section.flyer_link.click()
-    file_name = 'FLYER FIND THE BUG SESSION'
-    if browser == 'chrome':
-        file_name += '.pdf'
-    download_file_path = Path(os.getcwd()) / file_name
-    while True:  # needs timeout
-        if download_file_path.is_file():
-            break
-        time.sleep(1)
-    download_file_path.unlink()
+    a = is_file_downloaded(download_file_path)
+    assert a
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
