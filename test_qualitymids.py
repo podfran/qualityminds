@@ -68,14 +68,13 @@ def test_portfolio_mobile(main_page, browser):
     assert main_page.portfolio_sub_menu.is_displayed()
     wam_testing_page = main_page.click_web_automation_amp_mobile_testing()
     assert wam_testing_page.is_portfolio_item_selected()
-    wam_testing_page.mobile_section_title.click()
-    assert 'inactive-team-tab' not in wam_testing_page.mobile_section_title.get_attribute('class')
-    assert wam_testing_page.mobile_section.find_element_by_class_name('sb_mod_acf_single_item').is_displayed()
-    assert wam_testing_page.mobile_section.find_element_by_class_name('tab-download-button').is_displayed()
+    wam_testing_page.click_mobile_section_title()
+    assert wam_testing_page.mobile_section.section_body.is_displayed()
+    assert wam_testing_page.mobile_section.is_title_selected()
+    assert wam_testing_page.mobile_section.flyer_link.is_displayed()
     flyer_link_ref = 'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
-    flyer_link = wam_testing_page.mobile_section.find_element_by_xpath('.//a[contains(@download, "FLYER FIND THE BUG SESSION")]')
-    assert flyer_link.get_attribute('href') == flyer_link_ref
-    flyer_link.click()
+    assert wam_testing_page.mobile_section.flyer_link.get_attribute('href') == flyer_link_ref
+    wam_testing_page.mobile_section.flyer_link.click()
     file_name = 'FLYER FIND THE BUG SESSION'
     if browser == 'chrome':
         file_name += '.pdf'
