@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -64,12 +63,9 @@ def test_contact_email(main_page, browser):
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
-def test_portfolio_mobile(driver, wait, browser):
-    portfolio = driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
-    portfolio_hover = ActionChains(driver).move_to_element(portfolio)
-    portfolio_hover.perform()
-    portfolio_sub_menu = portfolio.find_element_by_xpath("//ul")
-    wait.until(EC.visibility_of(portfolio_sub_menu))
+def test_portfolio_mobile(driver, wait, main_page, browser):
+    main_page.hover_over_portfolio()
+    assert main_page.portfolio_sub_menu.is_displayed()
     web_automation_amp_mobile_testing = driver.find_element_by_link_text("Web, Automation & Mobile Testing")
     web_automation_amp_mobile_testing.click()
     page_title = driver.find_element_by_class_name('page_title')
