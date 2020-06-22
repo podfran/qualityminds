@@ -8,6 +8,8 @@ from selenium import webdriver
 from file_utils import is_file_downloaded
 from pages import MainPage
 
+BROWSERS = ['chrome', 'firefox']
+
 
 @pytest.fixture
 def available_browsers():
@@ -33,7 +35,7 @@ def available_browsers():
 
 
 @pytest.fixture
-@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+@pytest.mark.parametrize('browser', BROWSERS)
 def driver(available_browsers, browser):
     driver = available_browsers[browser]()
     driver.get('https://qualityminds.de')
@@ -48,19 +50,18 @@ def main_page(driver):
 
 
 @pytest.fixture
-@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+@pytest.mark.parametrize('browser', BROWSERS)
 def download_file_path(browser):
     file_name = 'FLYER FIND THE BUG SESSION'
     if browser == 'chrome':
         file_name += '.pdf'
     download_file_path = Path(os.getcwd()) / file_name
     yield download_file_path
-    print('Hello')
     with contextlib.suppress(FileNotFoundError):
         download_file_path.unlink()
 
 
-@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+@pytest.mark.parametrize('browser', BROWSERS)
 def test_contact_email(main_page, browser):
     kontakt_page = main_page.click_kontakt()
     assert 'hello@qualityminds.de' in kontakt_page
@@ -69,7 +70,7 @@ def test_contact_email(main_page, browser):
     assert kontakt_amp_anfahrt_page == kontakt_page
 
 
-@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+@pytest.mark.parametrize('browser', BROWSERS)
 def test_portfolio_mobile(main_page, download_file_path, browser):
     main_page.hover_over_portfolio()
     assert main_page.portfolio_sub_menu.is_displayed()
@@ -78,15 +79,14 @@ def test_portfolio_mobile(main_page, download_file_path, browser):
     wam_testing_page.click_mobile_section_title()
     assert wam_testing_page.mobile_section.section_body.is_displayed()
     assert wam_testing_page.mobile_section.is_title_selected()
-    assert wam_testing_page.mobile_section.flyer_link.is_displayed()
-    assert wam_testing_page.mobile_section.flyer_link.get_attribute('href') == \
+    assert wam_testing_page.mobile_section.flyer_download_link.is_displayed()
+    assert wam_testing_page.mobile_section.flyer_download_link.get_attribute('href') == \
            'https://qualityminds.de/app/uploads/2018/11/Find-The-Mobile-Bug-Session.pdf'
-    wam_testing_page.mobile_section.flyer_link.click()
-    a = is_file_downloaded(download_file_path)
-    assert a
+    wam_testing_page.mobile_section.flyer_download_link.click()
+    assert is_file_downloaded(download_file_path)
 
 
-@pytest.mark.parametrize('browser', ['chrome', 'firefox'])
+@pytest.mark.parametrize('browser', BROWSERS)
 def test_career_site(driver, main_page, browser):
     main_page.karriere.click()
     page_title = driver.find_element_by_xpath('//h1[contains(@class, "text-padded")]/span')

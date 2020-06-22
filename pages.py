@@ -72,7 +72,8 @@ class _MobileSection:
         self.driver = driver
         self.title = self.driver.find_element_by_xpath('//div[@id="team-tab-three-title-desktop"]/..')
         self.section_body = self.driver.find_element_by_id('team-tab-three-body')
-        self.flyer_link = self.section_body.find_element_by_xpath('.//a[@download="FLYER FIND THE BUG SESSION"]')
+        self.flyer_download_link = self.section_body.find_element_by_xpath(
+            './/a[@download="FLYER FIND THE BUG SESSION"]')
 
     def is_title_selected(self):
         return 'active-team-tab' in self.title.get_attribute('class') and \
