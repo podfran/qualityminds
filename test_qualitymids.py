@@ -4,8 +4,6 @@ from pathlib import Path
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 from pages import MainPage
 
@@ -41,11 +39,6 @@ def driver(available_browsers, browser):
     driver.implicitly_wait(10)
     yield driver
     driver.quit()
-
-
-@pytest.fixture
-def wait():
-    return WebDriverWait(driver, timeout=10)
 
 
 @pytest.fixture
