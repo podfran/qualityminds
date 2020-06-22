@@ -9,6 +9,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
+class MainPage:
+    def __init__(self, driver):
+        self.driver = driver
+        self.kontakt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]")
+        self.karriere = self.driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
+        self.kontakt_amp_anfahrt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt & Anfahrt')]")
+
+
 @pytest.fixture
 def available_browsers():
     def chrome():
@@ -47,15 +55,19 @@ def wait():
     return WebDriverWait(driver, timeout=10)
 
 
+@pytest.fixture
+def main_page(driver):
+    return MainPage(driver)
+
+
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
-def test_contact_email(driver, browser):
-    driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]").click()
+def test_contact_email(driver, main_page, browser):
+    main_page.kontakt.click()
     driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
     assert 'hello@qualityminds.de' in driver.page_source
     kontakt_page_main_content = driver.find_element_by_id('main-content').text
     driver.get('https://qualityminds.de')
-    kontakt_amp_anfahrt = driver.find_element_by_xpath("//a[contains(text(),'Kontakt & Anfahrt')]")
-    kontakt_amp_anfahrt.click()
+    main_page.kontakt_amp_anfahrt.click()
     driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
     assert driver.find_element_by_id('main-content').text == kontakt_page_main_content
 
@@ -97,8 +109,8 @@ def test_portfolio_mobile(driver, wait, browser):
 
 
 @pytest.mark.parametrize('browser', ['chrome', 'firefox'])
-def test_career_site(driver, browser):
-    driver.find_element_by_xpath("//a[contains(text(),'Karriere')]").click()
+def test_career_site(driver, main_page, browser):
+    main_page.karriere.click()
     page_title = driver.find_element_by_xpath('//h1[contains(@class, "text-padded")]/span')
     assert page_title.text == 'Werde ein QualityMind!'
     bewirb_dich_jetzt = driver.find_element_by_xpath('//a[contains(text(), "Bewirb dich jetzt!")]')
