@@ -88,28 +88,23 @@ def test_portfolio_mobile(main_page, download_file_path, browser):
 
 @pytest.mark.parametrize('browser', BROWSERS)
 def test_career_site(driver, main_page, browser):
-    main_page.karriere.click()
+    karriere_page = main_page.click_karriere()
     page_title = driver.find_element_by_xpath('//h1[contains(@class, "text-padded")]/span')
     assert page_title.text == 'Werde ein QualityMind!'
-    bewirb_dich_jetzt = driver.find_element_by_xpath('//a[contains(text(), "Bewirb dich jetzt!")]')
-    bewirb_dich_jetzt.click()
+    bewerbungsformular_page = karriere_page.click_bewirb_dich_jetzt()
     page_title = driver.find_element_by_id('job-ad-form-title')
     assert page_title.is_displayed()
-    submit_button = driver.find_element_by_xpath('//input[contains(@value, "Jetzt Bewerben")]')
-    submit_button.click()
-    form = driver.find_element_by_class_name('first_row')
-    assert len(form.find_elements_by_xpath(".//span[text()='Dies ist ein Pflichtfeld.']")) == 3
-    vorname = driver.find_element_by_xpath("//input[contains(@placeholder, 'Vorname')]")
-    vorname.send_keys('Franciszek')
-    nachname = driver.find_element_by_xpath("//input[contains(@placeholder, 'Nachname')]")
-    nachname.send_keys('Podborski')
-    submit_button.click()
+    bewerbungsformular_page.submit_button.click()
+    assert len(bewerbungsformular_page.form.find_elements_by_xpath(".//span[text()='Dies ist ein Pflichtfeld.']")) == 3
+    bewerbungsformular_page.name_field.send_keys('Franciszek')
+    bewerbungsformular_page.surname_field.send_keys('Podborski')
+    bewerbungsformular_page.submit_button.click()
     email_container = driver.find_element_by_xpath("//label[text()='Email']/..")
     email_validation = email_container.find_element_by_xpath(".//span/span")
     assert email_validation.text == 'Dies ist ein Pflichtfeld.'
     email_filed = email_container.find_element_by_tag_name('input')
     email_filed.send_keys('aaaaaa')
-    submit_button.click()
+    bewerbungsformular_page.submit_button.click()
     email_validation = email_container.find_element_by_xpath(".//span/span")
     assert email_validation.text == 'Die Eingabe muss eine gültige E-Mail-Adresse sein.'
     file_name = 'upload.txt'

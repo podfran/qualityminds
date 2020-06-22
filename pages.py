@@ -9,7 +9,7 @@ class MainPage:
         self.portfolio = self.driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
         self.portfolio_sub_menu = self.portfolio.find_element_by_xpath("./following-sibling::ul")
         self.kontakt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]")
-        self.karriere = self.driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
+        self.karriere = self.driver.find_element_by_xpath("//a[contains(text(),'Karriere')]")
         self.kontakt_amp_anfahrt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt & Anfahrt')]")
         self.wait = WebDriverWait(self.driver, timeout=10)
 
@@ -20,6 +20,10 @@ class MainPage:
     def click_kontakt_amp_anfahrt(self):
         self.kontakt_amp_anfahrt.click()
         return KontaktPage(self.driver)
+
+    def click_karriere(self):
+        self.karriere.click()
+        return KarrierePage(self.driver)
 
     def hover_over_portfolio(self):
         ActionChains(self.driver).move_to_element(self.portfolio).perform()
@@ -78,3 +82,24 @@ class _MobileSection:
     def is_title_selected(self):
         return 'active-team-tab' in self.title.get_attribute('class') and \
                'inactive-team-tab' not in self.title.get_attribute('class')
+
+
+class KarrierePage:
+    def __init__(self, driver):
+        self.driver = driver
+        self.jetzt_dich_bewerb = self.driver.find_element_by_xpath('//a[contains(text(), "Bewirb dich jetzt!")]')
+
+    def click_bewirb_dich_jetzt(self):
+        self.jetzt_dich_bewerb.click()
+        return BewerbungsformularPage(self.driver)
+
+
+class BewerbungsformularPage:
+    def __init__(self, driver):
+        self.driver = driver
+        self.submit_button = self.driver.find_element_by_xpath('//input[contains(@value, "Jetzt Bewerben")]')
+        self.form = self.driver.find_element_by_class_name('first_row')
+        self.name_field = self.driver.find_element_by_xpath("//input[contains(@placeholder, 'Vorname')]")
+        self.surname_field = self.driver.find_element_by_xpath("//input[contains(@placeholder, 'Nachname')]")
+
+
