@@ -99,13 +99,12 @@ def test_career_site(driver, main_page, browser):
     bewerbungsformular_page.name_field.send_keys('Franciszek')
     bewerbungsformular_page.surname_field.send_keys('Podborski')
     bewerbungsformular_page.submit_button.click()
+    assert len(bewerbungsformular_page.form.find_elements_by_xpath(".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 1
     email_container = driver.find_element_by_xpath("//label[text()='Email']/..")
-    email_validation = email_container.find_element_by_xpath(".//span/span")
-    assert email_validation.text == 'Dies ist ein Pflichtfeld.'
+    assert len(email_container.find_elements_by_xpath(".//span[text()='Dies ist ein Pflichtfeld.']"))
     bewerbungsformular_page.email_field.send_keys('aaaaaa')
     bewerbungsformular_page.submit_button.click()
-    email_validation = email_container.find_element_by_xpath(".//span/span")
-    assert email_validation.text == 'Die Eingabe muss eine gültige E-Mail-Adresse sein.'
+    assert len(email_container.find_elements_by_xpath(".//span[text()='Die Eingabe muss eine gültige E-Mail-Adresse sein.']")) == 1
     file_name = 'upload.txt'
     upload_file_path = Path(os.getcwd()) / file_name
     with open(upload_file_path, 'w') as upload_file:
