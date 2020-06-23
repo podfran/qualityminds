@@ -118,10 +118,8 @@ def test_career_site(driver, main_page, upload_file_path, browser):
     bewerbungsformular_page.submit_button.click()
     assert len(email_container.find_elements_by_xpath(
         ".//span[text()='Die Eingabe muss eine gültige E-Mail-Adresse sein.']")) == 1
-    upload_button = driver.find_element_by_xpath('//input[contains(@type, "file")]')
-    upload_button.send_keys(str(upload_file_path))
+    bewerbungsformular_page.upload_button.send_keys(str(upload_file_path))
     uploaded_file_name = driver.find_element_by_class_name('file-name')
     assert uploaded_file_name.text == upload_file_path.name
-    check_box = driver.find_element_by_xpath("//input[contains(@type, 'checkbox')]")
-    check_box.click()
-    assert check_box.is_selected()
+    bewerbungsformular_page.t_and_c_checkbox.click()
+    assert bewerbungsformular_page.t_and_c_checkbox.is_selected()

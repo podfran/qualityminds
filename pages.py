@@ -102,5 +102,5 @@ class BewerbungsformularPage:
         self.name_field = self.form.find_element_by_id("fld_1144146_1")
         self.surname_field = self.form.find_element_by_id("fld_7067875_1")
         self.email_field = self.form.find_element_by_id("fld_3149235_1")
-
-
+        self.upload_button = self.form.find_element_by_id("fld_8583967_1")
+        self.t_and_c_checkbox = self.form.find_element_by_id("fld_4989725_1_opt1865542")
