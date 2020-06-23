@@ -1,5 +1,7 @@
+import contextlib
 from pathlib import Path
 
+from selenium.common.exceptions import ElementNotInteractableException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
@@ -10,13 +12,22 @@ class Page:
     def __init__(self, driver):
         self.driver = driver
         self.wait = WebDriverWait(self.driver, timeout=15)
-        self.portfolio = self.driver.find_element_by_id("menu-item-220")
+
+    @property
+    def portfolio(self):
+        return self.driver.find_element_by_id("menu-item-220")
 
 
 class MainPage(Page):
     def __init__(self, driver):
         super().__init__(driver)
         self.portfolio_sub_menu = None
+        self.dismiss_cookies()
+
+    def dismiss_cookies(self):
+        with contextlib.suppress(ElementNotInteractableException):
+            dismiss_cookies = self.driver.find_element_by_xpath("//a[@aria-label='dismiss cookie message']")
+            dismiss_cookies.click()
 
     def click_kontakt(self):
         kontakt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]")
@@ -51,8 +62,7 @@ class MainPage(Page):
 class KontaktPage(Page):
     def __init__(self, driver):
         super().__init__(driver)
-        self.wait.until(expected_conditions.text_to_be_present_in_element(
-            (By.ID, "et-boc"),  # This is too wide. Can't catch h1 tag.
+        self.wait.until(expected_conditions.title_contains(
             'Kontakt & Anfahrt'
         ))
         self.page_content = self.driver.find_element_by_id('main-content').text
