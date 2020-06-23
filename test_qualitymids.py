@@ -61,6 +61,16 @@ def download_file_path(browser):
         download_file_path.unlink()
 
 
+@pytest.fixture
+def upload_file_path():
+    file_name = 'upload.txt'
+    upload_file_path = Path(os.getcwd()) / file_name
+    with open(upload_file_path, 'w') as upload_file:
+        upload_file.write('aaaa')
+    yield upload_file_path
+    upload_file_path.unlink()
+
+
 @pytest.mark.parametrize('browser', BROWSERS)
 def test_contact_email(main_page, browser):
     kontakt_page = main_page.click_kontakt()
@@ -87,7 +97,7 @@ def test_portfolio_mobile(main_page, download_file_path, browser):
 
 
 @pytest.mark.parametrize('browser', BROWSERS)
-def test_career_site(driver, main_page, browser):
+def test_career_site(driver, main_page, upload_file_path, browser):
     karriere_page = main_page.click_karriere()
     page_title = driver.find_element_by_xpath('//h1[contains(@class, "text-padded")]/span')
     assert page_title.text == 'Werde ein QualityMind!'
@@ -95,25 +105,23 @@ def test_career_site(driver, main_page, browser):
     page_title = driver.find_element_by_id('job-ad-form-title')
     assert page_title.is_displayed()
     bewerbungsformular_page.submit_button.click()
-    assert len(bewerbungsformular_page.form.find_elements_by_xpath(".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 3
+    assert len(bewerbungsformular_page.form.find_elements_by_xpath(
+        ".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 3
     bewerbungsformular_page.name_field.send_keys('Franciszek')
     bewerbungsformular_page.surname_field.send_keys('Podborski')
     bewerbungsformular_page.submit_button.click()
-    assert len(bewerbungsformular_page.form.find_elements_by_xpath(".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 1
+    assert len(bewerbungsformular_page.form.find_elements_by_xpath(
+        ".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 1
     email_container = driver.find_element_by_xpath("//label[text()='Email']/..")
     assert len(email_container.find_elements_by_xpath(".//span[text()='Dies ist ein Pflichtfeld.']"))
     bewerbungsformular_page.email_field.send_keys('aaaaaa')
     bewerbungsformular_page.submit_button.click()
-    assert len(email_container.find_elements_by_xpath(".//span[text()='Die Eingabe muss eine gültige E-Mail-Adresse sein.']")) == 1
-    file_name = 'upload.txt'
-    upload_file_path = Path(os.getcwd()) / file_name
-    with open(upload_file_path, 'w') as upload_file:
-        upload_file.write('aaaa')
+    assert len(email_container.find_elements_by_xpath(
+        ".//span[text()='Die Eingabe muss eine gültige E-Mail-Adresse sein.']")) == 1
     upload_button = driver.find_element_by_xpath('//input[contains(@type, "file")]')
     upload_button.send_keys(str(upload_file_path))
-    upload_file_path.unlink()
     uploaded_file_name = driver.find_element_by_class_name('file-name')
-    assert uploaded_file_name.text == file_name
+    assert uploaded_file_name.text == upload_file_path.name
     check_box = driver.find_element_by_xpath("//input[contains(@type, 'checkbox')]")
     check_box.click()
     assert check_box.is_selected()
