@@ -99,8 +99,6 @@ def test_portfolio_mobile(main_page, download_file_path, browser):
 @pytest.mark.parametrize('browser', BROWSERS)
 def test_career_site(driver, main_page, upload_file_path, browser):
     karriere_page = main_page.click_karriere()
-    page_title = driver.find_element_by_xpath('//h1[contains(@class, "text-padded")]/span')
-    assert page_title.text == 'Werde ein QualityMind!'
     bewerbungsformular_page = karriere_page.click_bewirb_dich_jetzt()
     page_title = driver.find_element_by_id('job-ad-form-title')
     assert page_title.is_displayed()

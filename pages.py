@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from selenium.webdriver import ActionChains
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -8,27 +9,28 @@ from selenium.webdriver.support.wait import WebDriverWait
 class MainPage:
     def __init__(self, driver):
         self.driver = driver
-        self.portfolio = self.driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
-        self.portfolio_sub_menu = self.portfolio.find_element_by_xpath("./following-sibling::ul")
-        self.kontakt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]")
-        self.karriere = self.driver.find_element_by_xpath("//a[contains(text(),'Karriere')]")
-        self.kontakt_amp_anfahrt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt & Anfahrt')]")
         self.wait = WebDriverWait(self.driver, timeout=10)
+        self.portfolio_sub_menu = None
 
     def click_kontakt(self):
-        self.kontakt.click()
+        kontakt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt')]")
+        kontakt.click()
         return KontaktPage(self.driver)
 
     def click_kontakt_amp_anfahrt(self):
-        self.kontakt_amp_anfahrt.click()
+        kontakt_amp_anfahrt = self.driver.find_element_by_xpath("//a[contains(text(),'Kontakt & Anfahrt')]")
+        kontakt_amp_anfahrt.click()
         return KontaktPage(self.driver)
 
     def click_karriere(self):
-        self.karriere.click()
+        karriere = self.driver.find_element_by_xpath("//a[contains(text(),'Karriere')]")
+        karriere.click()
         return KarrierePage(self.driver)
 
     def hover_over_portfolio(self):
-        ActionChains(self.driver).move_to_element(self.portfolio).perform()
+        portfolio = self.driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
+        ActionChains(self.driver).move_to_element(portfolio).perform()
+        self.portfolio_sub_menu = portfolio.find_element_by_xpath("./following-sibling::ul")
         self.wait.until(expected_conditions.visibility_of(self.portfolio_sub_menu))
 
     def click_web_automation_amp_mobile_testing(self):
@@ -61,12 +63,12 @@ class KontaktPage:
 class WAMTestingPage:
     def __init__(self, driver):
         self.driver = driver
-        self.portfolio = self.driver.find_element_by_id("menu-item-220")
-        self.mobile_section = _MobileSection(self.driver)
         self.wait = WebDriverWait(self.driver, timeout=10)
+        self.mobile_section = _MobileSection(self.driver)
 
     def is_portfolio_item_selected(self):
-        return 'current_page_ancestor' in self.portfolio.get_attribute('class')
+        portfolio = self.driver.find_element_by_id("menu-item-220")
+        return 'current_page_ancestor' in portfolio.get_attribute('class')
 
     def click_mobile_section_title(self):
         self.mobile_section.title.click()
@@ -89,10 +91,15 @@ class _MobileSection:
 class KarrierePage:
     def __init__(self, driver):
         self.driver = driver
-        self.jetzt_dich_bewerb = self.driver.find_element_by_xpath('//a[contains(text(), "Bewirb dich jetzt!")]')
+        self.wait = WebDriverWait(self.driver, timeout=10)
+        self.wait.until(expected_conditions.text_to_be_present_in_element(
+            (By.CSS_SELECTOR, "h1.text-padded"),
+            'Werde ein QualityMind!'
+        ))
 
     def click_bewirb_dich_jetzt(self):
-        self.jetzt_dich_bewerb.click()
+        jetzt_dich_bewerb = self.driver.find_element_by_xpath('//a[contains(text(), "Bewirb dich jetzt!")]')
+        jetzt_dich_bewerb.click()
         return BewerbungsformularPage(self.driver)
 
 
