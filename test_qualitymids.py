@@ -68,7 +68,8 @@ def upload_file_path():
     with open(upload_file_path, 'w') as upload_file:
         upload_file.write('aaaa')
     yield upload_file_path
-    upload_file_path.unlink()
+    with contextlib.suppress(FileNotFoundError):
+        upload_file_path.unlink()
 
 
 @pytest.mark.parametrize('browser', BROWSERS)
