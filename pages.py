@@ -51,7 +51,10 @@ class MainPage(Page):
 class KontaktPage(Page):
     def __init__(self, driver):
         super().__init__(driver)
-        self.driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
+        self.wait.until(expected_conditions.text_to_be_present_in_element(
+            (By.CSS_SELECTOR, "h1.text-padded"),
+            'Kontakt & Anfahrt'
+        ))
         self.page_content = self.driver.find_element_by_id('main-content').text
 
     def __contains__(self, item):
@@ -68,7 +71,10 @@ class KontaktPage(Page):
 class WAMTestingPage(Page):
     def __init__(self, driver):
         super().__init__(driver)
-        self.portfolio_sub_menu = None
+        self.wait.until(expected_conditions.text_to_be_present_in_element(
+            (By.CSS_SELECTOR, 'h1.text-padded'),
+            'Web, Automation & Mobile Testing'
+        ))
         self.mobile_section = _MobileSection(self.driver)
 
     def is_portfolio_item_selected(self):
@@ -109,12 +115,12 @@ class KarrierePage(Page):
 class BewerbungsformularPage(Page):
     def __init__(self, driver):
         super().__init__(driver)
-        self.form = self.driver.find_element_by_id('CF5bcf0384b847c_1')
-        self.t_and_c_checkbox = self.form.find_element_by_id("fld_4989725_1_opt1865542")
         self.wait.until(expected_conditions.text_to_be_present_in_element(
             (By.ID, 'job-ad-form-title'),
             'Bewerbungsformular'
         ))
+        self.form = self.driver.find_element_by_id('CF5bcf0384b847c_1')
+        self.t_and_c_checkbox = self.form.find_element_by_id("fld_4989725_1_opt1865542")
 
     def upload_file(self, filepath: Path):
         upload_button = self.form.find_element_by_id("fld_8583967_1")
