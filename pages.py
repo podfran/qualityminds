@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
@@ -104,3 +106,11 @@ class BewerbungsformularPage:
         self.email_field = self.form.find_element_by_id("fld_3149235_1")
         self.upload_button = self.form.find_element_by_id("fld_8583967_1")
         self.t_and_c_checkbox = self.form.find_element_by_id("fld_4989725_1_opt1865542")
+
+    def upload_file(self, filepath: Path):
+        self.upload_button.send_keys(str(filepath))
+
+    def get_uploaded_file_name(self):
+        uploaded_file_name = self.driver.find_element_by_class_name('file-name')
+        return uploaded_file_name.text
+
