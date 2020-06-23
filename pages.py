@@ -6,10 +6,16 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-class MainPage:
+class Page:
     def __init__(self, driver):
         self.driver = driver
         self.wait = WebDriverWait(self.driver, timeout=10)
+        self.portfolio = self.driver.find_element_by_id("menu-item-220")
+
+
+class MainPage(Page):
+    def __init__(self, driver):
+        super().__init__(driver)
         self.portfolio_sub_menu = None
 
     def click_kontakt(self):
@@ -28,9 +34,8 @@ class MainPage:
         return KarrierePage(self.driver)
 
     def hover_over_portfolio(self):
-        portfolio = self.driver.find_element_by_xpath("//a[contains(text(),'Portfolio')]")
-        ActionChains(self.driver).move_to_element(portfolio).perform()
-        self.portfolio_sub_menu = portfolio.find_element_by_xpath("./following-sibling::ul")
+        ActionChains(self.driver).move_to_element(self.portfolio).perform()
+        self.portfolio_sub_menu = self.portfolio.find_element_by_xpath("./ul")
         self.wait.until(expected_conditions.visibility_of(self.portfolio_sub_menu))
 
     def click_web_automation_amp_mobile_testing(self):
@@ -43,9 +48,9 @@ class MainPage:
         return WAMTestingPage(self.driver)
 
 
-class KontaktPage:
+class KontaktPage(Page):
     def __init__(self, driver):
-        self.driver = driver
+        super().__init__(driver)
         self.driver.find_element_by_xpath("//h1[contains(@class, 'text-padded')]/span")
         self.page_content = self.driver.find_element_by_id('main-content').text
 
@@ -60,15 +65,14 @@ class KontaktPage:
         return MainPage(self.driver)
 
 
-class WAMTestingPage:
+class WAMTestingPage(Page):
     def __init__(self, driver):
-        self.driver = driver
-        self.wait = WebDriverWait(self.driver, timeout=10)
+        super().__init__(driver)
+        self.portfolio_sub_menu = None
         self.mobile_section = _MobileSection(self.driver)
 
     def is_portfolio_item_selected(self):
-        portfolio = self.driver.find_element_by_id("menu-item-220")
-        return 'current_page_ancestor' in portfolio.get_attribute('class')
+        return 'current_page_ancestor' in self.portfolio.get_attribute('class')
 
     def click_mobile_section_title(self):
         self.mobile_section.title.click()
@@ -88,10 +92,9 @@ class _MobileSection:
                'inactive-team-tab' not in self.title.get_attribute('class')
 
 
-class KarrierePage:
+class KarrierePage(Page):
     def __init__(self, driver):
-        self.driver = driver
-        self.wait = WebDriverWait(self.driver, timeout=10)
+        super().__init__(driver)
         self.wait.until(expected_conditions.text_to_be_present_in_element(
             (By.CSS_SELECTOR, "h1.text-padded"),
             'Werde ein QualityMind!'
@@ -103,10 +106,9 @@ class KarrierePage:
         return BewerbungsformularPage(self.driver)
 
 
-class BewerbungsformularPage:
+class BewerbungsformularPage(Page):
     def __init__(self, driver):
-        self.driver = driver
-        self.wait = WebDriverWait(self.driver, timeout=10)
+        super().__init__(driver)
         self.form = self.driver.find_element_by_id('CF5bcf0384b847c_1')
         self.t_and_c_checkbox = self.form.find_element_by_id("fld_4989725_1_opt1865542")
         self.wait.until(expected_conditions.text_to_be_present_in_element(
