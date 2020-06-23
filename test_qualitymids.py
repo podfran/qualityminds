@@ -15,13 +15,13 @@ BROWSERS = ['chrome', 'firefox']
 def available_browsers():
     def chrome():
         options = webdriver.ChromeOptions()
-        options.add_experimental_option("prefs", {'download.default_directory': os.getcwd()})
+        options.add_experimental_option("prefs", {'download.default_directory': os.path.join(os.getcwd(), 'chrome')})
         return webdriver.Chrome(options=options)
 
     def firefox():
         profile = webdriver.FirefoxProfile()
         profile.set_preference("browser.download.folderList", 2)
-        profile.set_preference("browser.download.dir", os.getcwd())
+        profile.set_preference("browser.download.dir", os.path.join(os.getcwd(), 'firefox'))
         profile.set_preference("browser.download.useDownloadDir", True)
         profile.set_preference("browser.download.manager.showWhenStarting", False)
         profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/pdf")
@@ -55,16 +55,17 @@ def download_file_path(browser):
     file_name = 'FLYER FIND THE BUG SESSION'
     if browser == 'chrome':
         file_name += '.pdf'
-    download_file_path = Path(os.getcwd()) / file_name
+    download_file_path = Path(os.getcwd()) / browser / file_name
     yield download_file_path
     with contextlib.suppress(FileNotFoundError):
         download_file_path.unlink()
 
 
 @pytest.fixture
-def upload_file_path():
+@pytest.mark.parametrize('browser', BROWSERS)
+def upload_file_path(browser):
     file_name = 'upload.txt'
-    upload_file_path = Path(os.getcwd()) / file_name
+    upload_file_path = Path(os.getcwd()) / browser / file_name
     with open(upload_file_path, 'w') as upload_file:
         upload_file.write('aaaa')
     yield upload_file_path

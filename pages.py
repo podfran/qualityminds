@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 class Page:
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(self.driver, timeout=10)
+        self.wait = WebDriverWait(self.driver, timeout=15)
         self.portfolio = self.driver.find_element_by_id("menu-item-220")
 
 
@@ -52,7 +52,7 @@ class KontaktPage(Page):
     def __init__(self, driver):
         super().__init__(driver)
         self.wait.until(expected_conditions.text_to_be_present_in_element(
-            (By.CSS_SELECTOR, "h1.text-padded"),
+            (By.ID, "et-boc"),  # This is too wide. Can't catch h1 tag.
             'Kontakt & Anfahrt'
         ))
         self.page_content = self.driver.find_element_by_id('main-content').text
