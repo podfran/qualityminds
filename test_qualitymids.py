@@ -100,17 +100,17 @@ def test_portfolio_mobile(main_page, download_file_path, browser):
 def test_career_site(main_page, upload_file_path, browser):
     karriere_page = main_page.click_karriere()
     bewerbungsformular_page = karriere_page.click_bewirb_dich_jetzt()
-    bewerbungsformular_page.submit_button.click()
+    bewerbungsformular_page.click_submit()
     assert len(bewerbungsformular_page.form.find_elements_by_xpath(
         ".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 3
-    bewerbungsformular_page.name_field.send_keys('Franciszek')
-    bewerbungsformular_page.surname_field.send_keys('Podborski')
-    bewerbungsformular_page.submit_button.click()
+    bewerbungsformular_page.input_name('Franciszek')
+    bewerbungsformular_page.input_surname('Podborski')
+    bewerbungsformular_page.click_submit()
     assert len(bewerbungsformular_page.form.find_elements_by_xpath(
         ".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 1
     assert bewerbungsformular_page.get_error_text_for_email() == 'Dies ist ein Pflichtfeld.'
-    bewerbungsformular_page.email_field.send_keys('aaaaaa')
-    bewerbungsformular_page.submit_button.click()
+    bewerbungsformular_page.input_email_address('aaaaaa')
+    bewerbungsformular_page.click_submit()
     assert bewerbungsformular_page.get_error_text_for_email() == 'Die Eingabe muss eine gültige E-Mail-Adresse sein.'
     bewerbungsformular_page.upload_file(upload_file_path)
     assert bewerbungsformular_page.get_uploaded_file_name() == upload_file_path.name
