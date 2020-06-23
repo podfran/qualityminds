@@ -106,6 +106,7 @@ class KarrierePage:
 class BewerbungsformularPage:
     def __init__(self, driver):
         self.driver = driver
+        self.wait = WebDriverWait(self.driver, timeout=10)
         self.submit_button = self.driver.find_element_by_xpath('//input[@value="Jetzt Bewerben"]')
         self.form = self.driver.find_element_by_id('CF5bcf0384b847c_1')
         self.name_field = self.form.find_element_by_id("fld_1144146_1")
@@ -113,6 +114,10 @@ class BewerbungsformularPage:
         self.email_field = self.form.find_element_by_id("fld_3149235_1")
         self.upload_button = self.form.find_element_by_id("fld_8583967_1")
         self.t_and_c_checkbox = self.form.find_element_by_id("fld_4989725_1_opt1865542")
+        self.wait.until(expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'job-ad-form-title'),
+            'Bewerbungsformular'
+        ))
 
     def upload_file(self, filepath: Path):
         self.upload_button.send_keys(str(filepath))
@@ -120,4 +125,3 @@ class BewerbungsformularPage:
     def get_uploaded_file_name(self):
         uploaded_file_name = self.driver.find_element_by_class_name('file-name')
         return uploaded_file_name.text
-

@@ -100,8 +100,6 @@ def test_portfolio_mobile(main_page, download_file_path, browser):
 def test_career_site(driver, main_page, upload_file_path, browser):
     karriere_page = main_page.click_karriere()
     bewerbungsformular_page = karriere_page.click_bewirb_dich_jetzt()
-    page_title = driver.find_element_by_id('job-ad-form-title')
-    assert page_title.is_displayed()
     bewerbungsformular_page.submit_button.click()
     assert len(bewerbungsformular_page.form.find_elements_by_xpath(
         ".//div[contains(@class, 'first_col')]//span[text()='Dies ist ein Pflichtfeld.']")) == 3
