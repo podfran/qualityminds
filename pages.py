@@ -125,3 +125,7 @@ class BewerbungsformularPage:
     def get_uploaded_file_name(self):
         uploaded_file_name = self.driver.find_element_by_class_name('file-name')
         return uploaded_file_name.text
+
+    def get_error_text_for_email(self):
+        error_element = self.form.find_element_by_id('parsley-id-11')
+        return error_element.text
